@@ -13,6 +13,7 @@ The architecture is essentially based on the Strategy Software Design Pattern an
 
 The following is the core idea of the program's architecture in UML notation.<br>
 The UML diagram shows the strategy pattern applied to the program.<br>
+It does not show all complete classes along with all attributes and methods of the program.<br>
 
 ![CImageProcessingLibraryStrategyUML](./git_images/CImageProcessingLibrary-StrategyUML.png "CImageProcessingLibrary-StrategyUML")
 
