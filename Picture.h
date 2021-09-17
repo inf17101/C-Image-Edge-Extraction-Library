@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <iostream>
+#include "ArrayFunctions.h"
 
 struct PicturePGM
 {
@@ -19,26 +20,24 @@ struct PicturePGM
 
     PicturePGM(const PicturePGM& p) : height(p.height), width(p.width), size(p.size), max_value(p.max_value)
     {
-        map = new float*[p.height];
-        for(uint32_t i=0; i<p.height; ++i)
-            map[i] = new float[p.width];
-        
-        for(uint32_t i=0; i<p.height; ++i)
-            for(uint32_t j=0;j<p.width;++j)
-                map[i][j] = p.map[i][j];
+        bool result = create2dArray<float, uint32_t>(&map, p.height, p.width);
+        if (result)
+        {
+            for (uint32_t i = 0; i < p.height; ++i)
+                for (uint32_t j = 0; j < p.width; ++j)
+                    map[i][j] = p.map[i][j];
+        }
     }
 
-    PicturePGM(PicturePGM&& p) noexcept :height(p.height), width(p.width), size(p.size), max_value(p.max_value)
+    PicturePGM(PicturePGM&& p) noexcept : height(p.height), width(p.width), size(p.size), max_value(p.max_value)
     {
-        map = p.map;
-        p.map = nullptr;
+        delete2dArray(&map, height);
+        map = std::exchange(p.map, nullptr);
     }
 
     ~PicturePGM()
     {
-        for(uint32_t i=0; i<height; ++i)
-            delete [] map[i];
-        delete [] map;
+        delete2dArray(&map, height);
     }
 
     PicturePGM& operator =(const PicturePGM& p) noexcept
@@ -62,8 +61,7 @@ struct PicturePGM
         if (map != nullptr)
         {
             for (uint32_t r = 0; r < height; ++r)
-                for (uint32_t c = 0; c < width; ++c)
-                    delete[] map[c];
+                delete[] map[r];
             delete[] map;
         }
             
@@ -91,10 +89,7 @@ struct PicturePGM
             return *this;
         if (map != nullptr)
         {
-            for (uint32_t r = 0; r < height; ++r)
-                for (uint32_t c = 0; c < width; ++c)
-                    delete[] map[r];
-            delete[] map;
+            delete2dArray(&map, height);
         }
         map = std::exchange(p.map, nullptr);
         max_value = std::exchange(p.max_value, 0);
@@ -141,11 +136,8 @@ struct PicturePGM
         for(uint32_t i=1; i<height-1; ++i)
             for(uint32_t j=1; j<width-1; ++j)
                 new_map[i][j] = map[i-1][j-1];
-        
-        for(uint32_t i=0; i<height-padding*2; ++i)
-            delete [] map[i];
-        delete [] map;
-
+ 
+        delete2dArray(&map, height-padding*2);
         map = new_map;
 
     }
@@ -161,13 +153,11 @@ struct PicturePGM
         height -= padding*2;
         width -= padding*2;
         size = height * width;
-        float** new_map = new float*[height];
-        if(new_map == nullptr) {std::cout << "cannot allocate memory while removing padding." << std::endl; return;}
-        for(uint32_t i=0; i<height; ++i)
-        {
-            new_map[i] = new float[width];
-            if(new_map[i] == nullptr) {std::cout << "cannot allocate memory while removing padding." << std::endl; return;}
-        }
+
+        float** new_map = nullptr;
+        bool result = create2dArray<float, uint32_t>(&new_map, height, width);
+        if (!result)
+            return;
 
         for(uint32_t row=1; row<height+padding*2-1; ++row)
             for(uint32_t col=1; col<width+padding*2-1; ++col)
@@ -175,9 +165,7 @@ struct PicturePGM
         
         if(map != nullptr)
         {
-            for(uint32_t i=0; i<height+padding*2; ++i)
-                delete [] map[i];
-            delete [] map;
+            delete2dArray(&map, height + padding * 2);
         }
 
         map = new_map;
@@ -198,9 +186,7 @@ struct PicturePGM
 
         if(map != nullptr)
         {
-            for(uint32_t row=0; row<height; ++row)
-                delete [] map[row];
-            delete [] map;
+            delete2dArray(&map, height);
         }
         map = new_map;
         return true;

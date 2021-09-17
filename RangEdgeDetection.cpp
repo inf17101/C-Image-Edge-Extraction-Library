@@ -81,7 +81,6 @@ void RangEdgeDetection::calculate_rang_position(float array[], const std::size_t
         }
 
         delete[] parray;
-        delete parray;
 }
 
 void RangEdgeDetection::replace_by_threshold(PicturePGM* pic, float threshold)
@@ -109,20 +108,16 @@ std::unique_ptr<PicturePGM> RangEdgeDetection::processImage(PicturePGM* pic, Con
     c_sobel["gradient_only"] = new TypedImageProperty<bool>("gradient_only", true);
     auto GradientPicture = sobel->processImage(pic, c_sobel);
     delete c_sobel["gradient_only"];
-    GradientPicture->make_padding();
 
-    float** new_map = new float*[pic->height];
-    if(new_map == nullptr) return std::make_unique<PicturePGM>();
-    for(uint32_t i=0; i<pic->height; ++i)
-    {
-        new_map[i] = new float[pic->width];
-        if(new_map[i] == nullptr) return std::make_unique<PicturePGM>();
-    }
+    float** new_map = nullptr;
+    bool result = create2dArray<float, uint32_t>(&new_map, pic->height, pic->width);
+    if(!result)
+        return std::make_unique<PicturePGM>();
+
     auto rang_pic = std::make_unique<PicturePGM>(pic->height, pic->width, pic->height*pic->width, pic->max_value, new_map);
 
     const unsigned int surrounding_size = surrounding * surrounding;
     float* pixel_surrounding = new float[surrounding_size];
-    //float pixel_surrounding[surrounding_size];
     for(uint32_t row=0; row<GradientPicture->height-(surrounding-1); ++row)
     {
         for(uint32_t col=0; col<GradientPicture->width-(surrounding-1); ++col)

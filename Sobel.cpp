@@ -2,6 +2,7 @@
 #include <cmath>
 #include <memory>
 #include <algorithm>
+#include "ArrayFunctions.h"
 
 bool Sobel::isConfigValid(Config& c, float& threshold_value, bool& gradient_only)
 {
@@ -47,9 +48,9 @@ std::unique_ptr<PicturePGM> Sobel::processImage(PicturePGM* pic, Config& c)
     std::uint32_t new_size = pic->height-2 * pic->width-2;
     std::unique_ptr<PicturePGM> sobelPicture = std::make_unique<PicturePGM>(pic->height-2, pic->width-2, new_size, max_value, nullptr);
 
-    sobelPicture->map = new float*[sobelPicture->height];
-    for(uint32_t i=0; i<sobelPicture->height; ++i)
-        sobelPicture->map[i] = new float[sobelPicture->width];
+    bool result = create2dArray<float, uint32_t>(&(sobelPicture->map), sobelPicture->height, sobelPicture->width);
+    if (!result)
+        return sobelPicture;
 
     for(uint32_t i=0; i<pic->height-2; i++)
     {
