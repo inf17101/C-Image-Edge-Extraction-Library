@@ -95,6 +95,9 @@ void RangEdgeDetection::replace_by_threshold(PicturePGM* pic, float threshold)
 
 std::unique_ptr<PicturePGM> RangEdgeDetection::processImage(PicturePGM* pic, Config& c)
 {
+    if (pic->isEmpty())
+        return std::make_unique<PicturePGM>();
+
     float threshold_value;
     unsigned int surrounding;
     if (!isConfigValid(c, threshold_value, surrounding))

@@ -192,4 +192,9 @@ struct PicturePGM
         return true;
     }
 
+    bool isEmpty()
+    {
+        return (height == 0 || width == 0 || map == nullptr);
+    }
+
 };

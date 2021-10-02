@@ -34,6 +34,9 @@ bool Sobel::isConfigValid(Config& c, float& threshold_value, bool& gradient_only
 
 std::unique_ptr<PicturePGM> Sobel::processImage(PicturePGM* pic, Config& c)
 {
+    if (pic->isEmpty())
+        return std::make_unique<PicturePGM>();
+
     float threshold_value;
     bool gradient_only;
     if (!isConfigValid(c, threshold_value, gradient_only))
