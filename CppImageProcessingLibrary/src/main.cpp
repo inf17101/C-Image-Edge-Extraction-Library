@@ -23,7 +23,7 @@ void deleteConfig(Config& imgConfig)
 int main()
 {
 
-    const char FILE_PATH[] = "images/SteilkurveGRAY_pgm.pgm";
+    const char FILE_PATH[] = "../../CppImageProcessingLibrary/images/SteilkurveGRAY_pgm.pgm";
     auto imProcessor = std::make_unique<ImageProcessor>(std::make_unique<Sobel>());
     auto picture = imProcessor->readImage(FILE_PATH);
 
@@ -32,7 +32,7 @@ int main()
     sobelConfig["sobel_threshold"] =  new TypedImageProperty<float>("sobel_threshold", 100.0);
     sobelConfig["gradient_only"] = new TypedImageProperty<bool>("gradient_only", false);
     auto sobel_pic = imProcessor->processImage(picture.get(), sobelConfig);
-    imProcessor->writeImageAsPGM(sobel_pic.get(), "out/SteilkurveGRAY_pgm_out.pgm");
+    imProcessor->writeImageAsPGM(sobel_pic.get(), "../../CppImageProcessingLibrary/out/SteilkurveGRAY_pgm_out.pgm");
 
     // edge extraction using sobel with rank calculation
     Config rangConfig;
@@ -40,13 +40,15 @@ int main()
     rangConfig["surrounding"] = new TypedImageProperty<std::uint8_t>("surrounding", 3);
     imProcessor = std::make_unique<ImageProcessor>(std::make_unique<RangEdgeDetection>());
     auto output_pic = imProcessor->processImage(picture.get(), rangConfig);
-    imProcessor->writeImageAsPGM(output_pic.get(), "out/SteilkurveGRAY_pgm_rangbild_out.pgm");
+    imProcessor->writeImageAsPGM(output_pic.get(), "../../CppImageProcessingLibrary/out/SteilkurveGRAY_pgm_rangbild_out.pgm");
 
 
     // delete algorithm configuration
     deleteConfig(sobelConfig);
     deleteConfig(rangConfig);
 
+    std::cout << "Press any key to exit." << std::endl;
+    std::cin.get();
     return 0;
 }
 
