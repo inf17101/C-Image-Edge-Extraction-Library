@@ -25,7 +25,7 @@ void delete2dArray(T*** array, W height)
 
 	for (W i = 0; i < height; ++i)
 		delete[] (*array)[i];
-	delete *array;
+	delete  []*array;
 
 	*array = nullptr;
 }

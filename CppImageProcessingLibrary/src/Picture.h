@@ -18,7 +18,7 @@ struct PicturePGM
 
     PicturePGM() : height(0), width(0), size(0), max_value(0), map(nullptr) {}
 
-    PicturePGM(const PicturePGM& p) : height(p.height), width(p.width), size(p.size), max_value(p.max_value)
+    PicturePGM(const PicturePGM& p) : height(p.height), width(p.width), size(p.size), max_value(p.max_value), map(nullptr)
     {
         bool result = create2dArray<float, uint32_t>(&map, p.height, p.width);
         if (result)
@@ -46,28 +46,17 @@ struct PicturePGM
         if (this == &p)
             return *this;
 
-        if (height == p.height && width == p.width)
+        if (map != nullptr)
         {
-            // pictures with same size -> just copy
-            max_value = p.max_value;
-            std::copy(&p.map[0][0], &p.map[0][0] + p.height * p.width, &map[0][0]);
-            return *this;
+            delete2dArray(&map, height);
         }
 
         height = p.height;
         width = p.width;
         size = p.size;
-
-        if (map != nullptr)
-        {
-            for (uint32_t r = 0; r < height; ++r)
-                delete[] map[r];
-            delete[] map;
-        }
-            
         map = nullptr;
-        height = 0, width = 0;
         map = new float* [p.height];
+
         for (uint32_t r = 0; r < p.height; ++r)
         {
             map[r] = new float[p.width];
@@ -93,6 +82,9 @@ struct PicturePGM
         }
         map = std::exchange(p.map, nullptr);
         max_value = std::exchange(p.max_value, 0);
+        height = std::exchange(p.height, 0);
+        width = std::exchange(p.width, 0);
+        size = std::exchange(p.size, 0);
         return *this;
     }
 

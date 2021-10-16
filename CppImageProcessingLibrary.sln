@@ -5,6 +5,8 @@ VisualStudioVersion = 16.0.30611.23
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CppImageProcessingLibrary", "CppImageProcessingLibrary\CppImageProcessingLibrary.vcxproj", "{3E7DC605-957B-4352-9084-B6F256320ED4}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestCppImageProcessingLibrary", "TestCppImageProcessingLibrary\TestCppImageProcessingLibrary.vcxproj", "{1DAF1F73-BE19-4231-996B-6352FCE57742}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -21,6 +23,14 @@ Global
 		{3E7DC605-957B-4352-9084-B6F256320ED4}.Release|x64.Build.0 = Release|x64
 		{3E7DC605-957B-4352-9084-B6F256320ED4}.Release|x86.ActiveCfg = Release|Win32
 		{3E7DC605-957B-4352-9084-B6F256320ED4}.Release|x86.Build.0 = Release|Win32
+		{1DAF1F73-BE19-4231-996B-6352FCE57742}.Debug|x64.ActiveCfg = Debug|x64
+		{1DAF1F73-BE19-4231-996B-6352FCE57742}.Debug|x64.Build.0 = Debug|x64
+		{1DAF1F73-BE19-4231-996B-6352FCE57742}.Debug|x86.ActiveCfg = Debug|Win32
+		{1DAF1F73-BE19-4231-996B-6352FCE57742}.Debug|x86.Build.0 = Debug|Win32
+		{1DAF1F73-BE19-4231-996B-6352FCE57742}.Release|x64.ActiveCfg = Release|x64
+		{1DAF1F73-BE19-4231-996B-6352FCE57742}.Release|x64.Build.0 = Release|x64
+		{1DAF1F73-BE19-4231-996B-6352FCE57742}.Release|x86.ActiveCfg = Release|Win32
+		{1DAF1F73-BE19-4231-996B-6352FCE57742}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
