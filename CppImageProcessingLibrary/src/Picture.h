@@ -107,12 +107,12 @@ struct PicturePGM
     {
         if(padding < 1 || padding > 7)
         {
-            std::cout << "Wrong padding. Expected padding between 1 and 8" << std::endl;
+            std::cout << "Wrong padding. Expected padding between 1 and 7." << std::endl;
             return;
         }
-
-        height += padding*2;
-        width += padding*2;
+        uint32_t oldHeight = height;
+        height += (padding*2);
+        width += (padding*2);
         size = height * width;
         float** new_map = new float*[height];
         if(new_map == nullptr) {std::cout << "cannot allocate new memory for making padding." << std::endl; return;}
@@ -125,13 +125,12 @@ struct PicturePGM
                 new_map[i][j] = 0;
         }
 
-        for(uint32_t i=1; i<height-1; ++i)
-            for(uint32_t j=1; j<width-1; ++j)
-                new_map[i][j] = map[i-1][j-1];
+        for(uint32_t i=padding; i<height-padding; ++i)
+            for(uint32_t j=padding; j<width-padding; ++j)
+                new_map[i][j] = map[i-padding][j-padding];
  
-        delete2dArray(&map, height-padding*2);
+        delete2dArray(&map, oldHeight);
         map = new_map;
-
     }
 
     void removePadding(std::uint8_t padding=1)
