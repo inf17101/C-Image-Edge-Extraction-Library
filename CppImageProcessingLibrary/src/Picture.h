@@ -135,7 +135,9 @@ struct PicturePGM
 
     void removePadding(std::uint8_t padding=1)
     {
-        if((height-padding) < 1 || (width-padding) < 1)
+        int heightDifference = height - padding;
+        int widthDifference = width - padding;
+        if(heightDifference < 1 || widthDifference < 1)
         {
             std::cout << "removing padding does eliminate the picture. Padding size is too big." << std::endl;
             return;
@@ -150,9 +152,9 @@ struct PicturePGM
         if (!result)
             return;
 
-        for(uint32_t row=1; row<height+padding*2-1; ++row)
-            for(uint32_t col=1; col<width+padding*2-1; ++col)
-                new_map[row-1][col-1] = map[row][col];
+        for(uint32_t row=padding; row<height+padding*2-padding; ++row)
+            for(uint32_t col=padding; col<width+padding*2-padding; ++col)
+                new_map[row-padding][col-padding] = map[row][col];
         
         if(map != nullptr)
         {
