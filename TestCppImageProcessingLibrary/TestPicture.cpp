@@ -370,3 +370,52 @@ TEST(TestPicture, TestMakePaddingWithIllegalPaddingOption)
 	EXPECT_NE(pic.map, nullptr);
 
 }
+
+TEST(TestPicture, TestRemovePadding)
+{
+	/*
+		Test remove padding around image
+		pic.removePadding();
+		picture padding should be removed according to 
+		the padding size passed as argument into the method (default 1)
+		Example:
+		0 0 0 0
+		0 8 8 0		8 8 
+		0 8 8 0		8 8
+		0 0 0 0
+		height=oldHeight, width=oldWidth
+		size = height * width
+	*/
+	const uint32_t oldHeight = 2, oldWidth = 2;
+	const uint32_t oldSize = oldHeight * oldWidth;
+	const uint32_t height = 4, width = 4;
+	const uint32_t size = height * width;
+	const uint8_t max_value = 8;
+
+	float** examplePictureMapPic = nullptr;
+	auto result = create2dArray<float, uint32_t>(&examplePictureMapPic, height, width);
+	if (!result)
+		EXPECT_EQ(1, 0);
+	for (uint32_t r = 0; r < height; ++r)
+		for (uint32_t c = 0; c < width; ++c)
+			examplePictureMapPic[r][c] = 0;
+
+	for (uint32_t r = 1; r <= oldHeight; ++r)
+		for (uint32_t c = 1; c <= oldWidth; ++c)
+			examplePictureMapPic[r][c] = max_value;
+
+	PicturePGM pic{ height, width, size, max_value, examplePictureMapPic };
+
+	// remove the padding
+	pic.removePadding();
+
+	EXPECT_EQ(pic.height, oldHeight);
+	EXPECT_EQ(pic.width, oldWidth);
+	EXPECT_EQ(pic.size, oldSize);
+	EXPECT_EQ(pic.max_value, max_value);
+	EXPECT_NE(pic.map, nullptr);
+	for(uint32_t r = 0; r < oldHeight; ++r)
+		for(uint32_t c = 0; c < oldWidth; ++c)
+			EXPECT_EQ(pic.map[r][c], max_value);
+
+}
