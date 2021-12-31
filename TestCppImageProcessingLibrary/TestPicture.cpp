@@ -1,19 +1,17 @@
 #include "pch.h"
 #include "Picture.h"
-#include "ArrayFunctions.h"
 
 TEST(TestPicture, TestDefaultConstructor) {
 	/*
 		Test Default Constructor = Empty image
-		Empty PicturePGM: height=0, width=0, max_value=0, map=nullptr;
+		Empty PicturePGM: height=0, width=0, max_value=0;
 	*/
 
-	PicturePGM emptyPicture;
-	EXPECT_EQ(emptyPicture.height, 0);
-	EXPECT_EQ(emptyPicture.width, 0);
-	EXPECT_EQ(emptyPicture.size, 0);
-	EXPECT_EQ(emptyPicture.max_value, 0);
-	EXPECT_EQ(emptyPicture.map, nullptr);
+	const PicturePGM emptyPicture;
+	EXPECT_EQ(emptyPicture.getHeight(), 0);
+	EXPECT_EQ(emptyPicture.getWidth(), 0);
+	EXPECT_EQ(emptyPicture.getSize(), 0);
+	EXPECT_EQ(emptyPicture.getMaxValue(), 0);
 }
 
 TEST(TestPicture, TestConstructor) {
@@ -24,17 +22,13 @@ TEST(TestPicture, TestConstructor) {
 	const uint32_t height = 9, width = 9;
 	const uint32_t size = height * width;
 	const uint8_t max_value = 128;
-	float** examplePictureMap = nullptr;
-	auto result = create2dArray<float, uint32_t>(&examplePictureMap, height, width);
-	if (!result)
-		EXPECT_EQ(1, 0);
+	const std::vector<std::vector<float>> examplePictureMap{ height, std::vector<float>{width} };
 	
 	PicturePGM emptyPicture{height, width, size, max_value, examplePictureMap};
-	EXPECT_EQ(emptyPicture.height, height);
-	EXPECT_EQ(emptyPicture.width, width);
-	EXPECT_EQ(emptyPicture.size, size);
-	EXPECT_EQ(emptyPicture.max_value, max_value);
-	EXPECT_NE(emptyPicture.map, nullptr);
+	EXPECT_EQ(emptyPicture.getHeight(), height);
+	EXPECT_EQ(emptyPicture.getWidth(), width);
+	EXPECT_EQ(emptyPicture.getSize(), size);
+	EXPECT_EQ(emptyPicture.getMaxValue(), max_value);
 }
 
 TEST(TestPicture, TestCopyConstructor)
@@ -47,21 +41,17 @@ TEST(TestPicture, TestCopyConstructor)
 	const uint32_t size = height * width;
 	const uint8_t max_value = 128;
 
-	float** examplePictureMap = nullptr;
-	auto result = create2dArray<float, uint32_t>(&examplePictureMap, height, width);
-	if (!result)
-		EXPECT_EQ(1, 0);
-
+	const std::vector<std::vector<float>> examplePictureMap( height, std::vector<float>(width));
 	PicturePGM newPicture{ height, width, size, max_value, examplePictureMap };
 	PicturePGM otherPicture{ newPicture };
-	EXPECT_EQ(otherPicture.height, newPicture.height);
-	EXPECT_EQ(otherPicture.width, newPicture.width);
-	EXPECT_EQ(otherPicture.max_value, newPicture.max_value);
-	EXPECT_EQ(otherPicture.size, newPicture.size);
+	EXPECT_EQ(otherPicture.getHeight(), newPicture.getHeight());
+	EXPECT_EQ(otherPicture.getWidth(), newPicture.getWidth());
+	EXPECT_EQ(otherPicture.getMaxValue(), newPicture.getMaxValue());
+	EXPECT_EQ(otherPicture.getSize(), newPicture.getSize());
 
-	for(uint32_t r=0; r<otherPicture.height; ++r)
-		for(uint32_t c=0; c<otherPicture.width; ++c)
-			EXPECT_EQ(otherPicture.map[r][c], newPicture.map[r][c]);
+	for(uint32_t r=0; r<otherPicture.getHeight(); ++r)
+		for(uint32_t c=0; c<otherPicture.getWidth(); ++c)
+			EXPECT_EQ(otherPicture.get(r, c), newPicture.get(r, c));
 }
 
 TEST(TestPicture, TestMoveConstructor)
@@ -73,22 +63,18 @@ TEST(TestPicture, TestMoveConstructor)
 	const uint32_t height = 9, width = 9;
 	const uint32_t size = height * width;
 	const uint8_t max_value = 0;
+	const std::vector<std::vector<float>>examplePictureMap(height, std::vector<float>(width));
 
-	float** examplePictureMap = nullptr;
-	auto result = create2dArray<float, uint32_t>(&examplePictureMap, height, width);
-	if (!result)
-		EXPECT_EQ(1, 0);
 
 	PicturePGM newPicture(PicturePGM{ height, width, size, max_value, examplePictureMap });
-	EXPECT_EQ(newPicture.height, height);
-	EXPECT_EQ(newPicture.width, width);
-	EXPECT_EQ(newPicture.size, size);
-	EXPECT_EQ(newPicture.max_value, max_value);
-	EXPECT_NE(newPicture.map, nullptr);
+	EXPECT_EQ(newPicture.getHeight(), height);
+	EXPECT_EQ(newPicture.getWidth(), width);
+	EXPECT_EQ(newPicture.getSize(), size);
+	EXPECT_EQ(newPicture.getMaxValue(), max_value);
 	
-	for (uint32_t r = 0; r < newPicture.height; ++r)
-		for (uint32_t c = 0; c < newPicture.width; ++c)
-			EXPECT_EQ(examplePictureMap[r][c], newPicture.map[r][c]);
+	for (uint32_t r = 0; r < newPicture.getHeight(); ++r)
+		for (uint32_t c = 0; c < newPicture.getWidth(); ++c)
+			EXPECT_EQ(examplePictureMap[r][c], newPicture.get(r, c));
 }
 
 TEST(TestPicture, TestCopyAssignmentWithDifferentSize)
@@ -101,25 +87,21 @@ TEST(TestPicture, TestCopyAssignmentWithDifferentSize)
 	const uint32_t height = 9, width = 9;
 	const uint32_t size = height * width;
 	const uint8_t max_value = 0;
+	const std::vector<std::vector<float>> examplePictureMap( height, std::vector<float>(width));
 
-	float** examplePictureMap = nullptr;
-	auto result = create2dArray<float, uint32_t>(&examplePictureMap, height, width);
-	if (!result)
-		EXPECT_EQ(1, 0);
 
 	PicturePGM pic1;
 	PicturePGM pic2 { height, width, size, max_value, examplePictureMap };
 	pic1 = pic2;
 
-	EXPECT_EQ(pic1.height, pic2.height);
-	EXPECT_EQ(pic1.width, pic2.width);
-	EXPECT_EQ(pic1.size, pic2.size);
-	EXPECT_EQ(pic1.max_value, pic2.max_value);
-	EXPECT_NE(pic1.map, nullptr);
+	EXPECT_EQ(pic1.getHeight(), pic2.getHeight());
+	EXPECT_EQ(pic1.getWidth(), pic2.getWidth());
+	EXPECT_EQ(pic1.getSize(), pic2.getSize());
+	EXPECT_EQ(pic1.getMaxValue(), pic2.getMaxValue());
 
-	for (uint32_t r = 0; r < pic1.height; ++r)
-		for (uint32_t c = 0; c < pic1.width; ++c)
-			EXPECT_EQ(pic1.map[r][c], pic2.map[r][c]);
+	for (uint32_t r = 0; r < pic1.getHeight(); ++r)
+		for (uint32_t c = 0; c < pic1.getWidth(); ++c)
+			EXPECT_EQ(pic1.get(r, c), pic2.get(r, c));
 }
 
 TEST(TestPicture, TestCopyAssignmentWithSameSize)
@@ -134,32 +116,21 @@ TEST(TestPicture, TestCopyAssignmentWithSameSize)
 	const uint8_t max_valuePic1 = 0;
 	const uint8_t max_valuePic2 = 8;
 
-	float** examplePictureMapPic1 = nullptr;
-	auto result = create2dArray<float, uint32_t>(&examplePictureMapPic1, height, width);
-	if (!result)
-		EXPECT_EQ(1, 0);
-
-	float** examplePictureMapPic2 = nullptr;
-	result = create2dArray<float, uint32_t>(&examplePictureMapPic2, height, width);
-	if (!result)
-		EXPECT_EQ(1, 0);
-	for (uint32_t r = 0; r < height; ++r)
-		for (uint32_t c = 0; c < width; ++c)
-			examplePictureMapPic2[r][c] = max_valuePic2;
+	const std::vector<std::vector<float>> examplePictureMapPic1(height, std::vector<float>(width, max_valuePic1));
+	const std::vector<std::vector<float>> examplePictureMapPic2(height, std::vector<float>(width, max_valuePic2));
 
 	PicturePGM pic1{ height, width, size, max_valuePic1, examplePictureMapPic1 };
-	PicturePGM pic2{ height, width, size, max_valuePic2, examplePictureMapPic2};
+	PicturePGM pic2{ height, width, size, max_valuePic2, examplePictureMapPic2 };
 	pic1 = pic2;
 
-	EXPECT_EQ(pic1.height, pic2.height);
-	EXPECT_EQ(pic1.width, pic2.width);
-	EXPECT_EQ(pic1.size, pic2.size);
-	EXPECT_EQ(pic1.max_value, pic2.max_value);
-	EXPECT_NE(pic1.map, nullptr);
+	EXPECT_EQ(pic1.getHeight(), pic2.getHeight());
+	EXPECT_EQ(pic1.getWidth(), pic2.getWidth());
+	EXPECT_EQ(pic1.getSize(), pic2.getSize());
+	EXPECT_EQ(pic1.getMaxValue(), pic2.getMaxValue());
 
-	for (uint32_t r = 0; r < pic1.height; ++r)
-		for (uint32_t c = 0; c < pic1.width; ++c)
-			EXPECT_EQ(pic1.map[r][c], pic2.map[r][c]);
+	for (uint32_t r = 0; r < pic1.getHeight(); ++r)
+		for (uint32_t c = 0; c < pic1.getWidth(); ++c)
+			EXPECT_EQ(pic1.get(r,c), pic2.get(r,c));
 }
 
 TEST(TestPicture, TestMoveAssignment)
@@ -172,34 +143,26 @@ TEST(TestPicture, TestMoveAssignment)
 	const uint32_t height = 9, width = 9;
 	const uint32_t size = height * width;
 	const uint8_t max_value = 8;
-
-	float** examplePictureMapPic2 = nullptr;
-	auto result = create2dArray<float, uint32_t>(&examplePictureMapPic2, height, width);
-	if (!result)
-		EXPECT_EQ(1, 0);
-	for (uint32_t r = 0; r < height; ++r)
-		for (uint32_t c = 0; c < width; ++c)
-			examplePictureMapPic2[r][c] = max_value;
+	const std::vector<std::vector<float>>examplePictureMapPic2(height, std::vector<float>(width, max_value));
 
 	PicturePGM pic1;
 	PicturePGM pic2{ height, width, size, max_value, examplePictureMapPic2 };
 
 	pic1 = std::move(pic2);
-	EXPECT_EQ(pic1.height, height);
-	EXPECT_EQ(pic1.width, width);
-	EXPECT_EQ(pic1.size, size);
-	EXPECT_EQ(pic1.max_value, max_value);
-	EXPECT_NE(pic1.map, nullptr);
+	EXPECT_EQ(pic1.getHeight(), height);
+	EXPECT_EQ(pic1.getWidth(), width);
+	EXPECT_EQ(pic1.getSize(), size);
+	EXPECT_EQ(pic1.getMaxValue(), max_value);
 
-	for (uint32_t r = 0; r < pic1.height; ++r)
-		for (uint32_t c = 0; c < pic1.width; ++c)
-			EXPECT_EQ(pic1.map[r][c], examplePictureMapPic2[r][c]);
+	for (uint32_t r = 0; r < pic1.getHeight(); ++r)
+		for (uint32_t c = 0; c < pic1.getWidth(); ++c)
+			EXPECT_EQ(pic1.get(r,c), examplePictureMapPic2[r][c]);
 
-	EXPECT_EQ(pic2.height, 0);
-	EXPECT_EQ(pic2.width, 0);
-	EXPECT_EQ(pic2.size, 0);
-	EXPECT_EQ(pic2.max_value, 0);
-	EXPECT_EQ(pic2.map, nullptr);
+	EXPECT_EQ(pic2.getHeight(), 0);
+	EXPECT_EQ(pic2.getWidth(), 0);
+	EXPECT_EQ(pic2.getSize(), 0);
+	EXPECT_EQ(pic2.getMaxValue(), 0);
+	EXPECT_TRUE(pic2.isEmpty());
 }
 
 TEST(TestPicture, TestMakePaddingDefault)
@@ -221,41 +184,33 @@ TEST(TestPicture, TestMakePaddingDefault)
 	const uint32_t size = height * width;
 	const uint8_t max_value = 8;
 	const uint8_t padding = 1;
-
-	float** examplePictureMapPic = nullptr;
-	auto result = create2dArray<float, uint32_t>(&examplePictureMapPic, height, width);
-	if (!result)
-		EXPECT_EQ(1, 0);
-	for (uint32_t r = 0; r < height; ++r)
-		for (uint32_t c = 0; c < width; ++c)
-			examplePictureMapPic[r][c] = max_value;
+	const std::vector<std::vector<float>> examplePictureMapPic(height, std::vector<float>(width, max_value));
 
 	PicturePGM pic{ height, width, size, max_value, examplePictureMapPic };
 	pic.make_padding();
-	EXPECT_EQ(pic.height, height+padding*2);
-	EXPECT_EQ(pic.width, width+padding*2);
-	EXPECT_EQ(pic.size, (height+padding*2) * (width+padding*2));
-	EXPECT_EQ(pic.max_value, max_value);
-	EXPECT_NE(pic.map, nullptr);
+	EXPECT_EQ(pic.getHeight(), height+padding*2);
+	EXPECT_EQ(pic.getWidth(), width+padding*2);
+	EXPECT_EQ(pic.getSize(), (height+padding*2) * (width+padding*2));
+	EXPECT_EQ(pic.getMaxValue(), max_value);
 
 	// check if first col and last col has 0 padding
-	for (uint32_t r = 0; r < pic.height; ++r)
+	for (uint32_t r = 0; r < pic.getHeight(); ++r)
 	{
-		EXPECT_EQ(pic.map[r][0], 0);
-		EXPECT_EQ(pic.map[r][pic.width-padding], 0);
+		EXPECT_EQ(pic.get(r,0), 0);
+		EXPECT_EQ(pic.get(r, pic.getWidth()-padding), 0);
 	}
 
 	// check if first row and last row has 0 padding
-	for (uint32_t c = 0; c < pic.width; ++c)
+	for (uint32_t c = 0; c < pic.getWidth(); ++c)
 	{
-		EXPECT_EQ(pic.map[0][c], 0);
-		EXPECT_EQ(pic.map[pic.height-padding][c], 0);
+		EXPECT_EQ(pic.get(0, c), 0);
+		EXPECT_EQ(pic.get(pic.getHeight()-padding, c), 0);
 	}
 
 	// check if original image values are unmodified
-	for (uint32_t r = padding; r < pic.height - padding; ++r)
-		for (uint32_t c = padding; c < pic.width - padding; ++c)
-			EXPECT_EQ(pic.map[r][c], max_value);
+	for (uint32_t r = padding; r < pic.getHeight() - padding; ++r)
+		for (uint32_t c = padding; c < pic.getWidth() - padding; ++c)
+			EXPECT_EQ(pic.get(r, c), max_value);
 }
 
 TEST(TestPicture, TestMakePaddingWith7PixelPadding)
@@ -289,48 +244,40 @@ TEST(TestPicture, TestMakePaddingWith7PixelPadding)
 	const uint32_t size = height * width;
 	const uint8_t max_value = 8;
 	const uint8_t padding = 7;
-
-	float** examplePictureMapPic = nullptr;
-	auto result = create2dArray<float, uint32_t>(&examplePictureMapPic, height, width);
-	if (!result)
-		EXPECT_EQ(1, 0);
-	for (uint32_t r = 0; r < height; ++r)
-		for (uint32_t c = 0; c < width; ++c)
-			examplePictureMapPic[r][c] = max_value;
+	const std::vector<std::vector<float>> examplePictureMapPic(height, std::vector<float>(width, max_value));
 
 	PicturePGM pic{ height, width, size, max_value, examplePictureMapPic };
 	pic.make_padding(7);
 
-	EXPECT_EQ(pic.height, height + padding * 2);
-	EXPECT_EQ(pic.width, width + padding * 2);
-	EXPECT_EQ(pic.size, (height + padding * 2) * (width + padding * 2));
-	EXPECT_EQ(pic.max_value, max_value);
-	EXPECT_NE(pic.map, nullptr);
+	EXPECT_EQ(pic.getHeight(), height + padding * 2);
+	EXPECT_EQ(pic.getWidth(), width + padding * 2);
+	EXPECT_EQ(pic.getSize(), (height + padding * 2) * (width + padding * 2));
+	EXPECT_EQ(pic.getMaxValue(), max_value);
 
 	// check if first col and last col has 0 padding
-	for (uint32_t r = 0; r < pic.height; ++r)
+	for (uint32_t r = 0; r < pic.getHeight(); ++r)
 	{
 		for (uint32_t c = 0; c < padding; ++c)
 		{
-			EXPECT_EQ(pic.map[r][c], 0);
-			EXPECT_EQ(pic.map[r][pic.width - padding + c], 0);
+			EXPECT_EQ(pic.get(r,c), 0);
+			EXPECT_EQ(pic.get(r, pic.getWidth() - padding + c), 0);
 		}
 	}
 
 	// check if first row and last row has 0 padding
-	for (uint32_t c = 0; c < pic.height; ++c)
+	for (uint32_t c = 0; c < pic.getHeight(); ++c)
 	{
 		for (uint32_t r = 0; r < padding; ++r)
 		{
-			EXPECT_EQ(pic.map[r][c], 0);
-			EXPECT_EQ(pic.map[pic.width - padding + r][c], 0);
+			EXPECT_EQ(pic.get(r,c), 0);
+			EXPECT_EQ(pic.get(pic.getWidth() - padding + r, c), 0);
 		}
 	}
 
 	// check if original image values are unmodified
-	for (uint32_t r = padding; r < pic.height - padding; ++r)
-		for (uint32_t c = padding; c < pic.width - padding; ++c)
-			EXPECT_EQ(pic.map[r][c], max_value);
+	for (uint32_t r = padding; r < pic.getHeight() - padding; ++r)
+		for (uint32_t c = padding; c < pic.getWidth() - padding; ++c)
+			EXPECT_EQ(pic.get(r,c), max_value);
 }
 
 TEST(TestPicture, TestMakePaddingWithIllegalPaddingOption)
@@ -350,25 +297,16 @@ TEST(TestPicture, TestMakePaddingWithIllegalPaddingOption)
 	const uint32_t size = height * width;
 	const uint8_t max_value = 8;
 	const uint8_t illegalPadding = 8;
-
-	float** examplePictureMapPic = nullptr;
-	auto result = create2dArray<float, uint32_t>(&examplePictureMapPic, height, width);
-	if (!result)
-		EXPECT_EQ(1, 0);
-	for (uint32_t r = 0; r < height; ++r)
-		for (uint32_t c = 0; c < width; ++c)
-			examplePictureMapPic[r][c] = max_value;
+	const std::vector<std::vector<float>> examplePictureMapPic(height, std::vector<float>(width, max_value));
 
 	PicturePGM pic{ height, width, size, max_value, examplePictureMapPic };
 	pic.make_padding(illegalPadding);
 
 	// check if picture is unmodified because of illegal padding argument
-	EXPECT_EQ(pic.height, height);
-	EXPECT_EQ(pic.width, width);
-	EXPECT_EQ(pic.size, height * width);
-	EXPECT_EQ(pic.max_value, max_value);
-	EXPECT_NE(pic.map, nullptr);
-
+	EXPECT_EQ(pic.getHeight(), height);
+	EXPECT_EQ(pic.getWidth(), width);
+	EXPECT_EQ(pic.getSize(), height * width);
+	EXPECT_EQ(pic.getMaxValue(), max_value);
 }
 
 TEST(TestPicture, TestRemovePadding)
@@ -392,13 +330,7 @@ TEST(TestPicture, TestRemovePadding)
 	const uint32_t size = height * width;
 	const uint8_t max_value = 8;
 
-	float** examplePictureMapPic = nullptr;
-	auto result = create2dArray<float, uint32_t>(&examplePictureMapPic, height, width);
-	if (!result)
-		EXPECT_EQ(1, 0);
-	for (uint32_t r = 0; r < height; ++r)
-		for (uint32_t c = 0; c < width; ++c)
-			examplePictureMapPic[r][c] = 0;
+	std::vector<std::vector<float>> examplePictureMapPic(height, std::vector<float>(width, 0.0f));
 
 	for (uint32_t r = 1; r <= oldHeight; ++r)
 		for (uint32_t c = 1; c <= oldWidth; ++c)
@@ -409,14 +341,13 @@ TEST(TestPicture, TestRemovePadding)
 	// remove the padding
 	pic.removePadding();
 
-	EXPECT_EQ(pic.height, oldHeight);
-	EXPECT_EQ(pic.width, oldWidth);
-	EXPECT_EQ(pic.size, oldSize);
-	EXPECT_EQ(pic.max_value, max_value);
-	EXPECT_NE(pic.map, nullptr);
+	EXPECT_EQ(pic.getHeight(), oldHeight);
+	EXPECT_EQ(pic.getWidth(), oldWidth);
+	EXPECT_EQ(pic.getSize(), oldSize);
+	EXPECT_EQ(pic.getMaxValue(), max_value);
 	for(uint32_t r = 0; r < oldHeight; ++r)
 		for(uint32_t c = 0; c < oldWidth; ++c)
-			EXPECT_EQ(pic.map[r][c], max_value);
+			EXPECT_EQ(pic.get(r,c), max_value);
 }
 
 TEST(TestPicture, TestRemovePaddingNoDefaultPadding)
@@ -453,13 +384,7 @@ TEST(TestPicture, TestRemovePaddingNoDefaultPadding)
 	const uint8_t max_value = 8;
 	const uint8_t paddingSize = 7;
 
-	float** examplePictureMapPic = nullptr;
-	auto result = create2dArray<float, uint32_t>(&examplePictureMapPic, height, width);
-	if (!result)
-		EXPECT_EQ(1, 0);
-	for (uint32_t r = 0; r < height; ++r)
-		for (uint32_t c = 0; c < width; ++c)
-			examplePictureMapPic[r][c] = 0;
+	std::vector<std::vector<float>> examplePictureMapPic(height, std::vector<float>(width, 0.0f));
 
 	for (uint32_t r = 7; r <= 8; ++r)
 		for (uint32_t c = 7; c <= 8; ++c)
@@ -470,14 +395,13 @@ TEST(TestPicture, TestRemovePaddingNoDefaultPadding)
 	// remove the padding
 	pic.removePadding(paddingSize);
 
-	EXPECT_EQ(pic.height, oldHeight);
-	EXPECT_EQ(pic.width, oldWidth);
-	EXPECT_EQ(pic.size, oldSize);
-	EXPECT_EQ(pic.max_value, max_value);
-	EXPECT_NE(pic.map, nullptr);
+	EXPECT_EQ(pic.getHeight(), oldHeight);
+	EXPECT_EQ(pic.getWidth(), oldWidth);
+	EXPECT_EQ(pic.getSize(), oldSize);
+	EXPECT_EQ(pic.getMaxValue(), max_value);
 	for (uint32_t r = 0; r < oldHeight; ++r)
 		for (uint32_t c = 0; c < oldWidth; ++c)
-			EXPECT_EQ(pic.map[r][c], max_value);
+			EXPECT_EQ(pic.get(r,c), max_value);
 }
 
 TEST(TestPicture, TestRemovePaddingIllegalPaddingSize)
@@ -500,13 +424,7 @@ TEST(TestPicture, TestRemovePaddingIllegalPaddingSize)
 	const uint8_t max_value = 8;
 	const uint8_t paddingSize = 10;
 
-	float** examplePictureMapPic = nullptr;
-	auto result = create2dArray<float, uint32_t>(&examplePictureMapPic, height, width);
-	if (!result)
-		EXPECT_EQ(1, 0);
-	for (uint32_t r = 0; r < height; ++r)
-		for (uint32_t c = 0; c < width; ++c)
-			examplePictureMapPic[r][c] = 0;
+	std::vector<std::vector<float>> examplePictureMapPic(height, std::vector<float>(width, 0.0f));
 
 	for (uint32_t r = 1; r <= oldHeight; ++r)
 		for (uint32_t c = 1; c <= oldWidth; ++c)
@@ -517,20 +435,19 @@ TEST(TestPicture, TestRemovePaddingIllegalPaddingSize)
 	// remove padding should not change picture because padding size is illegal
 	pic.removePadding(paddingSize);
 
-	EXPECT_EQ(pic.height, height);
-	EXPECT_EQ(pic.width, width);
-	EXPECT_EQ(pic.size, size);
-	EXPECT_EQ(pic.max_value, max_value);
-	EXPECT_NE(pic.map, nullptr);
+	EXPECT_EQ(pic.getHeight(), height);
+	EXPECT_EQ(pic.getWidth(), width);
+	EXPECT_EQ(pic.getSize(), size);
+	EXPECT_EQ(pic.getMaxValue(), max_value);
 	for (uint32_t r = 0; r < height; ++r)
-		EXPECT_EQ(pic.map[r][0], 0);
+		EXPECT_EQ(pic.get(r,0), 0);
 	for (uint32_t r = 0; r < height; ++r)
-		EXPECT_EQ(pic.map[r][3], 0);
+		EXPECT_EQ(pic.get(r,3), 0);
 	for (uint32_t c = 0; c < width; ++c)
-		EXPECT_EQ(pic.map[0][c], 0);
+		EXPECT_EQ(pic.get(0, c), 0);
 	for (uint32_t c = 0; c < width; ++c)
-		EXPECT_EQ(pic.map[3][c], 0);
+		EXPECT_EQ(pic.get(3,c), 0);
 	for (uint32_t r = 1; r < oldHeight; ++r)
 		for (uint32_t c = 1; c < oldWidth; ++c)
-			EXPECT_EQ(pic.map[r][c], max_value);
+			EXPECT_EQ(pic.get(r,c), max_value);
 }

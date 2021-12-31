@@ -5,11 +5,11 @@
 #include <vector>
 #include <map>
 
-using Config= std::map<std::string, ImageProperty*>;
+using Config= std::map<std::string, std::unique_ptr<ImageProperty>>;
 
 class ImageAlgorithmStrategy
 {
     public:
         virtual ~ImageAlgorithmStrategy() = default;
-        virtual std::unique_ptr<PicturePGM> processImage(PicturePGM* pic, Config& c) = 0;
+        virtual PicturePGM processImage(PicturePGM& pic, Config& c) noexcept = 0;
 };

@@ -2,7 +2,7 @@
 #include <cstring>
 #include <fstream>
 
-bool ImageProcessor::checkPaddingOption(uint8_t padding_size)
+bool ImageProcessor::checkPaddingOption(uint8_t padding_size) noexcept
 {
     if(padding_size < 2 || padding_size > 7)
     {
@@ -12,82 +12,77 @@ bool ImageProcessor::checkPaddingOption(uint8_t padding_size)
     return true;
 }
 
-std::unique_ptr<PicturePGM> ImageProcessor::readImage(const char* filename, uint8_t padding_size)
+PicturePGM ImageProcessor::readImage(const std::string& filename, uint8_t padding_size) noexcept
 {
-    if(!checkPaddingOption(padding_size)) return std::make_unique<PicturePGM>();
+    if (!checkPaddingOption(padding_size)) return PicturePGM{};
 
-    FILE *fhandle = fopen(filename, "rb");
+    FILE *fhandle = fopen(filename.c_str(), "rb");
     if (!fhandle)
     {
         std::cerr << "File could not be opened." << std::endl;
-        return std::make_unique<PicturePGM>();
+        return PicturePGM{};
     }
     std::cout << "Opened file " << filename << " correctly!" << std::endl;
 
     char line[75];
-    if (fgets(line, sizeof(line), fhandle) == NULL) return std::make_unique<PicturePGM>();
+    if (fgets(line, sizeof(line), fhandle) == NULL) return PicturePGM{};
 
-    if(strncmp(line, "P5",2) != 0) return std::make_unique<PicturePGM>();
+    if(strncmp(line, "P5",2) != 0) return PicturePGM{};
 
-    if(fgets(line, sizeof(line), fhandle) == NULL) return std::make_unique<PicturePGM>();
+    if(fgets(line, sizeof(line), fhandle) == NULL) return PicturePGM{};
 
-    std::unique_ptr<PicturePGM> inputPicture = std::make_unique<PicturePGM>();
-    inputPicture->width = strtoul(strtok(line, " "), NULL, 10);
-    inputPicture->height = strtoul(strtok(NULL, " "), NULL, 10);
-    inputPicture->size = inputPicture->height * inputPicture -> width;
-    
-    if(fgets(line, sizeof(line), fhandle) == NULL) return std::make_unique<PicturePGM>();
-    inputPicture->max_value = (uint8_t) strtoul(line, NULL, 10);
+    std::uint32_t width = strtoul(strtok(line, " "), NULL, 10) + padding_size;
+    std::uint32_t height = strtoul(strtok(NULL, " "), NULL, 10) + padding_size;
+    std::uint32_t size = height * width;
 
-    inputPicture->height += padding_size; //because of zero padding
-    inputPicture->width += padding_size;
+    if(fgets(line, sizeof(line), fhandle) == NULL) return PicturePGM{};
+    std::uint8_t max_value = (uint8_t) strtoul(line, NULL, 10);
 
-    auto success = inputPicture->reinitWithValue(0.0, inputPicture->width, inputPicture->height);
-    if(!success) return std::make_unique<PicturePGM>();
+    std::vector<std::vector<float>> pictureMap(height, std::vector<float>(width, 0.0f));
 
-    for (uint32_t i=1; i<inputPicture->height-1; ++i)
-        for(uint32_t j=1; j<inputPicture->width-1; ++j)
-            inputPicture->map[i][j] = static_cast<float> (fgetc(fhandle));
+    for (uint32_t i=1; i<height-1; ++i)
+        for(uint32_t j=1; j<width-1; ++j)
+            pictureMap[i][j] = static_cast<float> (fgetc(fhandle));
 
     fclose(fhandle);
 
-    return inputPicture;
+    return PicturePGM (height, width, size, max_value, pictureMap);
 
 }
 
-std::unique_ptr<PicturePGM> ImageProcessor::processImage(PicturePGM* pic, Config& c)
+PicturePGM ImageProcessor::processImage(PicturePGM& pic, Config& c) noexcept
 {
     return algorithm_->processImage(pic,c);
 }
 
-int8_t ImageProcessor::writeImageAsPGM(PicturePGM* pic, const char* FILE_PATH)
+bool ImageProcessor::writeImageAsPGM(PicturePGM& pic, const std::string& FILE_PATH) noexcept
 {
     std::ofstream of(FILE_PATH, std::ios::out
                                 | std::ios_base::binary
                                 | std::ios_base::trunc);
     if(!of)
-        return -1;
+        return false;
     
     of << "P5\n";
-    of << pic->width << " " << pic->height << "\n";
+    of << pic.getWidth() << " " << pic.getHeight() << "\n";
 
     /*
         must be converted to unsigned int otherwise
         image software cannot open the result image properly
     */
-    of << static_cast<unsigned int>(pic->max_value) << "\n";
+    of << static_cast<unsigned int>(pic.getMaxValue()) << "\n";
 
     if(of.bad())
-        return -1;
+        return false;
 
-    for(uint32_t i=0; i<pic->height; ++i)
-        for(uint32_t j=0; j<pic->width; ++j)
-            of.put(pic->map[i][j]);
+    for(uint32_t i=0; i<pic.getHeight(); ++i)
+        for(uint32_t j=0; j<pic.getWidth(); ++j)
+            of.put(static_cast<char>(pic.get(i,j)));
     
     if(of.bad())
-        return -1;
+        return false;
     of.close();
 
-    return 0;
+    return true;
 
 }

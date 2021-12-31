@@ -4,19 +4,21 @@
 
 class ImageProperty
 {
-    std::string name_;
     public:
         ImageProperty(const std::string& name) : name_(name) {}
         virtual ~ImageProperty() = default;
-        std::string getPropertyName() const { return name_; }
+        const std::string getPropertyName() const { return name_; }
+    private:
+        std::string name_;
 };
 
 template<typename T>
 class TypedImageProperty : public ImageProperty
 {
-    T data_;
     public:
         TypedImageProperty(const std::string& name, const T& data) : ImageProperty(name), data_(data) {}
         T getProperty() const { return data_; }
+    private:
+        T data_;
 
 };
