@@ -33,30 +33,27 @@ bool RangEdgeDetection::isConfigValid(Config& c, float& threshold_value, unsigne
     return validConfig;
 }
 
-void RangEdgeDetection::calculate_rang_position(float array[], const std::size_t len) noexcept
+void RangEdgeDetection::calculate_rang_position(std::vector<float>& pixelVector) noexcept
 {
-    float **parray = new float*[len];
-    if(parray == nullptr) {std::cout << "ERROR: cannot allocate memory to calculate rang position." << std::endl; exit(1);}
-    for(size_t i=0;i<len; ++i)
-        parray[i] = array + i;
-    std::sort(parray, parray + len, [](float* left, float* right){ return (*left) < (*right); });
-    size_t pos = 0;
-    int first = -1;
-    int last = -1;
-    float item = (*parray[0]);
-    for(pos=0; pos < len; ++pos)
+    std::sort(pixelVector.begin(), pixelVector.end(), [](const float& lhs, const float& rhs) { return lhs < rhs; });
+    size_t pos{ 0 };
+    const size_t sizeOfVector{ pixelVector.size() };
+    int first{ -1 };
+    int last{ -1 };
+    float item = pixelVector[0];
+    for(; pos < sizeOfVector; ++pos)
     {
-        if((*parray[pos]) != item)
+        if(pixelVector[pos] != item)
         {
-            item = (*parray[pos]);
+            item = pixelVector[pos];
             if(first < last)
             {
                 int rang = (first+last)/2;
                 for(;first<=last; ++first)
-                    (*parray[first-1]) = static_cast<float>(rang);
+                    pixelVector[first-1] = static_cast<float>(rang);
             }else
             {
-                (*parray[pos-1]) = static_cast<float>(first);
+                pixelVector[pos-1] = static_cast<float>(first);
             }
 
             first = -1;
@@ -73,13 +70,11 @@ void RangEdgeDetection::calculate_rang_position(float array[], const std::size_t
         {
         int rang = (first+last)/2;
         for(;first<=last; ++first)
-            (*parray[first-1]) = static_cast<float>(rang);
+            pixelVector[first-1] = static_cast<float>(rang);
         }else
         {
-            (*parray[pos-1]) = static_cast<float>(first);
+            pixelVector[pos-1] = static_cast<float>(first);
         }
-
-        delete[] parray;
 }
 
 void RangEdgeDetection::replace_by_threshold(PicturePGM& pic, float threshold) noexcept
@@ -115,26 +110,24 @@ PicturePGM RangEdgeDetection::processImage(PicturePGM& pic, Config& c) noexcept
                     std::vector<std::vector<float>>(pic.getHeight(), std::vector<float>(pic.getWidth())) };
 
     const unsigned int surrounding_size = surrounding * surrounding;
-    float* pixel_surrounding = new float[surrounding_size];
-    //std::vector<float> pixel_surrounding(surrounding_size);
+    std::vector<float> pixel_surrounding(surrounding_size);
     for(uint32_t row=0; row<GradientPicture.getHeight()-(surrounding-1); ++row)
     {
         for(uint32_t col=0; col<GradientPicture.getWidth()-(surrounding-1); ++col)
         {
             for(unsigned int i=0; i<surrounding; ++i)
                 for(unsigned int j=0; j<surrounding; ++j)
-                    pixel_surrounding[i*surrounding + j] = GradientPicture.get(row+i, col+j);
+                    pixel_surrounding[(i*surrounding) + j] = GradientPicture.get(row+i, col+j);
             
-            calculate_rang_position(pixel_surrounding, surrounding_size);
+            calculate_rang_position(pixel_surrounding);
             for(unsigned int i=0; i<surrounding; ++i)
                 for(unsigned int j=0; j<surrounding; ++j)
                 {
-                    rang_pic.set(pixel_surrounding[i * surrounding + j], row+i, col+j);
+                    rang_pic.set(pixel_surrounding[(i * surrounding) + j], row+i, col+j);
                 }
         }
     }
 
-    delete [] pixel_surrounding;
     replace_by_threshold(rang_pic, threshold_value);
     rang_pic.removePadding();
     return rang_pic;
