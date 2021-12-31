@@ -117,7 +117,7 @@ PicturePGM RangEdgeDetection::processImage(PicturePGM& pic, Config& c) noexcept
         {
             for(unsigned int i=0; i<surrounding; ++i)
                 for(unsigned int j=0; j<surrounding; ++j)
-                    pixel_surrounding[(i*surrounding) + j] = GradientPicture.get(row+i, col+j);
+                    pixel_surrounding[(i * surrounding) + j] = GradientPicture.get(row+i, col+j);
             
             calculate_rang_position(pixel_surrounding);
             for(unsigned int i=0; i<surrounding; ++i)
