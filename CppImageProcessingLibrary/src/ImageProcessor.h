@@ -19,4 +19,6 @@ class ImageProcessor
     private:
         std::unique_ptr<ImageAlgorithmStrategy> algorithm_;
         bool checkPaddingOption(uint8_t padding_size) noexcept;
+        std::tuple<std::string, std::uint32_t, std::uint32_t, std::uint16_t> readHeader(std::ifstream& inputFile) noexcept;
+        bool isValidPGMHeader(const std::string& pgmVersion, const std::uint32_t height, const std::uint32_t width, const std::uint16_t maxValue) const noexcept;
 };

@@ -8,18 +8,18 @@
 class PicturePGM
 {
     public:
-        explicit PicturePGM(const std::uint32_t h, const std::uint32_t w, const std::uint32_t s, const std::uint8_t max_v, const std::vector<std::vector<float>>& m)
-        : height_(h), width_(w), size_(s), max_value_(max_v), map_(m) 
+        explicit PicturePGM(const std::uint32_t h, const std::uint32_t w, const std::uint32_t s, const std::uint16_t max_v, const std::vector<std::vector<float>>& m)
+        : height_(h), width_(w), size_(s), maxValue_(max_v), map_(m) 
         {
         }
 
-        explicit PicturePGM() : height_(0), width_(0), size_(0), max_value_(0), map_({{}}) {}
+        explicit PicturePGM() : height_(0), width_(0), size_(0), maxValue_(0), map_({{}}) {}
 
-        PicturePGM(const PicturePGM& p) noexcept : height_(p.height_), width_(p.width_), size_(p.size_), max_value_(p.max_value_), map_(p.map_)
+        PicturePGM(const PicturePGM& p) noexcept : height_(p.height_), width_(p.width_), size_(p.size_), maxValue_(p.maxValue_), map_(p.map_)
         {
         }
 
-        PicturePGM(PicturePGM&& p) noexcept : height_(p.height_), width_(p.width_), size_(p.size_), max_value_(p.max_value_), map_(std::move(p.map_))
+        PicturePGM(PicturePGM&& p) noexcept : height_(p.height_), width_(p.width_), size_(p.size_), maxValue_(p.maxValue_), map_(std::move(p.map_))
         {
             p.map_ = {{}};
         }
@@ -38,7 +38,7 @@ class PicturePGM
             width_ = p.width_;
             size_ = p.size_;
             map_ = p.map_;
-            max_value_ = p.max_value_;
+            maxValue_ = p.maxValue_;
         
             return *this;
         }
@@ -49,17 +49,17 @@ class PicturePGM
                 return *this;
 
             map_ = std::exchange(p.map_, {});
-            max_value_ = std::exchange(p.max_value_, 0);
+            maxValue_ = std::exchange(p.maxValue_, 0);
             height_ = std::exchange(p.height_, 0);
             width_ = std::exchange(p.width_, 0);
             size_ = std::exchange(p.size_, 0);
             return *this;
         }
 
-        void printPic() const noexcept
+        void print() const noexcept
         {
             std::cout << "Picture: " << "\n" << "width: " << width_ << "\nheight: " << height_ << std::endl;
-            std::cout << "size: " << size_ << "\nmax value: " << static_cast<unsigned int>(max_value_) << std::endl;
+            std::cout << "size: " << size_ << "\nmax value: " << static_cast<unsigned int>(maxValue_) << std::endl;
 
             for(uint32_t i=0; i<height_; ++i)
             {
@@ -75,7 +75,7 @@ class PicturePGM
         {
             if(padding < 1 || padding > 7)
             {
-                std::cout << "Wrong padding. Expected padding between 1 and 7." << std::endl;
+                std::cerr << "Wrong padding. Expected padding between 1 and 7." << std::endl;
                 return;
             }
 
@@ -97,7 +97,7 @@ class PicturePGM
             int widthDifference = width_ - padding;
             if(heightDifference < 1 || widthDifference < 1)
             {
-                std::cout << "removing padding does eliminate the picture. Padding size is too big." << std::endl;
+                std::cerr << "removing padding does eliminate the picture. Padding size is too big." << std::endl;
                 return;
             }
 
@@ -121,12 +121,12 @@ class PicturePGM
             return true;
         }
 
-        const bool isEmpty() noexcept
+        const bool isEmpty() const noexcept
         {
             return (height_ == 0 || width_ == 0 || size_ == 0);
         }
 
-        const float get(std::uint32_t row, std::uint32_t column) const noexcept
+        const float get(const std::uint32_t row, const std::uint32_t column) const noexcept
         {
             if (row >= height_ || column >= width_)
                 return -1.0f;
@@ -134,7 +134,7 @@ class PicturePGM
             return map_[row][column];
         }
 
-        void set(float value, std::uint32_t row, std::uint32_t column) noexcept
+        void set(const float value, const std::uint32_t row, const std::uint32_t column) noexcept
         {
             if (row >= height_ || column >= width_)
                 return;
@@ -144,33 +144,33 @@ class PicturePGM
 
         void setMaxValue(const std::uint8_t newMaxValue) noexcept
         {
-            max_value_ = newMaxValue;
+            maxValue_ = newMaxValue;
         }
 
-        const std::uint32_t getHeight() const noexcept
+        const auto getHeight() const noexcept
         {
             return height_;
         }
 
-        const std::uint32_t getWidth() const noexcept
+        const auto getWidth() const noexcept
         {
             return width_;
         }
 
-        const std::uint32_t getSize() const noexcept
+        const auto getSize() const noexcept
         {
             return size_;
         }
 
-        const std::uint8_t getMaxValue() const noexcept
+        const auto getMaxValue() const noexcept
         {
-            return max_value_;
+            return maxValue_;
         }
 
     private:
         std::uint32_t height_;
         std::uint32_t width_;
         std::uint32_t size_;
-        std::uint8_t max_value_;
+        std::uint16_t maxValue_;
         std::vector<std::vector<float>> map_;
 };

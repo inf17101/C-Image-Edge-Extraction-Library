@@ -12,42 +12,42 @@ bool ImageProcessor::checkPaddingOption(uint8_t padding_size) noexcept
     return true;
 }
 
+std::tuple<std::string, std::uint32_t, std::uint32_t, std::uint16_t> ImageProcessor::readHeader(std::ifstream& inputFile) noexcept
+{
+    std::string header{ "" };
+    std::uint32_t width{ 0 };
+    std::uint32_t height{ 0 };
+    std::uint16_t maxValue{ 0 };
+    inputFile >> header >> width >> height >> maxValue;
+    return { header, height, width, maxValue };
+}
+
+bool ImageProcessor::isValidPGMHeader(const std::string& pgmVersion, const std::uint32_t height,
+    const std::uint32_t width, const std::uint16_t maxValue) const noexcept
+{
+    return pgmVersion.compare("P5\n") && height > 0 && width > 0 && maxValue > 0 && maxValue <= 255;
+}
+
 PicturePGM ImageProcessor::readImage(const std::string& filename, uint8_t padding_size) noexcept
 {
-    if (!checkPaddingOption(padding_size)) return PicturePGM{};
+    std::ifstream inputFile{ filename };
+    if (!inputFile.is_open()) { return PicturePGM{}; }
 
-    FILE *fhandle = fopen(filename.c_str(), "rb");
-    if (!fhandle)
+    const auto [pgmVersion, height, width, maxValue] = readHeader(inputFile);
+    if (!isValidPGMHeader(pgmVersion, height, width, maxValue)) { return PicturePGM{}; }
+
+    const std::uint32_t size = height * width;
+    std::vector<std::vector<float>> pictureMap(height, std::vector<float>(width));
+    unsigned char pixelValue;
+    for (std::uint32_t row{ 0 }; row < height; ++row)
     {
-        std::cerr << "File could not be opened." << std::endl;
-        return PicturePGM{};
+        for (std::uint32_t col{ 0 }; col < width && inputFile >> pixelValue; ++col)
+        {
+            pictureMap[row][col] = static_cast<float>(pixelValue);
+        }
     }
-    std::cout << "Opened file " << filename << " correctly!" << std::endl;
 
-    char line[75];
-    if (fgets(line, sizeof(line), fhandle) == NULL) return PicturePGM{};
-
-    if(strncmp(line, "P5",2) != 0) return PicturePGM{};
-
-    if(fgets(line, sizeof(line), fhandle) == NULL) return PicturePGM{};
-
-    std::uint32_t width = strtoul(strtok(line, " "), NULL, 10) + padding_size;
-    std::uint32_t height = strtoul(strtok(NULL, " "), NULL, 10) + padding_size;
-    std::uint32_t size = height * width;
-
-    if(fgets(line, sizeof(line), fhandle) == NULL) return PicturePGM{};
-    std::uint8_t max_value = (uint8_t) strtoul(line, NULL, 10);
-
-    std::vector<std::vector<float>> pictureMap(height, std::vector<float>(width, 0.0f));
-
-    for (uint32_t i=1; i<height-1; ++i)
-        for(uint32_t j=1; j<width-1; ++j)
-            pictureMap[i][j] = static_cast<float> (fgetc(fhandle));
-
-    fclose(fhandle);
-
-    return PicturePGM (height, width, size, max_value, pictureMap);
-
+    return PicturePGM{ height, width, size, static_cast<std::uint8_t>(maxValue), pictureMap };
 }
 
 PicturePGM ImageProcessor::processImage(PicturePGM& pic, Config& c) noexcept

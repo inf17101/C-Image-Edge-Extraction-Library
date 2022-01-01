@@ -111,12 +111,12 @@ PicturePGM RangEdgeDetection::processImage(PicturePGM& pic, Config& c) noexcept
 
     const unsigned int surrounding_size = surrounding * surrounding;
     std::vector<float> pixel_surrounding(surrounding_size);
-    for(uint32_t row=0; row<GradientPicture.getHeight()-(surrounding-1); ++row)
+    for (uint32_t row{0}; row < GradientPicture.getHeight() - (surrounding - 1); ++row)
     {
-        for(uint32_t col=0; col<GradientPicture.getWidth()-(surrounding-1); ++col)
+        for (uint32_t col{0}; col < GradientPicture.getWidth() - (surrounding - 1); ++col)
         {
-            for(unsigned int i=0; i<surrounding; ++i)
-                for(unsigned int j=0; j<surrounding; ++j)
+            for(unsigned int i = 0; i<surrounding; ++i)
+                for(unsigned int j = 0; j<surrounding; ++j)
                     pixel_surrounding[(i * surrounding) + j] = GradientPicture.get(row+i, col+j);
             
             calculate_rang_position(pixel_surrounding);
