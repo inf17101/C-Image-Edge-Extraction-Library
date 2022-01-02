@@ -71,7 +71,7 @@ class PicturePGM
             }
         }
 
-        void make_padding(std::uint8_t padding=1) noexcept
+        void makePadding(std::uint8_t padding=1) noexcept
         {
             if(padding < 1 || padding > 7)
             {

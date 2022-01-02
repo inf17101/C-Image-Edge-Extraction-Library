@@ -2,7 +2,7 @@
 #include <cstring>
 #include <fstream>
 
-bool ImageProcessor::checkPaddingOption(uint8_t padding_size) noexcept
+bool ImageProcessor::checkPaddingOption(std::uint8_t padding_size) const noexcept
 {
     if(padding_size < 2 || padding_size > 7)
     {
@@ -28,22 +28,23 @@ bool ImageProcessor::isValidPGMHeader(const std::string& pgmVersion, const std::
     return pgmVersion.compare("P5\n") && height > 0 && width > 0 && maxValue > 0 && maxValue <= 255;
 }
 
-PicturePGM ImageProcessor::readImage(const std::string& filename, uint8_t padding_size) noexcept
+PicturePGM ImageProcessor::readImage(const std::string& filename, std::uint8_t padding_size) noexcept
 {
-    std::ifstream inputFile{ filename };
+    std::ifstream inputFile{ filename, std::ios::in | std::ios_base::binary };
     if (!inputFile.is_open()) { return PicturePGM{}; }
 
     const auto [pgmVersion, height, width, maxValue] = readHeader(inputFile);
     if (!isValidPGMHeader(pgmVersion, height, width, maxValue)) { return PicturePGM{}; }
 
     const std::uint32_t size = height * width;
-    std::vector<std::vector<float>> pictureMap(height, std::vector<float>(width));
-    unsigned char pixelValue;
+    std::vector<std::vector<float>> pictureMap(height, std::vector<float>(width, 0.0f));
+    char pixelValue;
     for (std::uint32_t row{ 0 }; row < height; ++row)
     {
-        for (std::uint32_t col{ 0 }; col < width && inputFile >> pixelValue; ++col)
+        for (std::uint32_t col{ 0 }; col < width && inputFile.get(pixelValue); ++col)
         {
-            pictureMap[row][col] = static_cast<float>(pixelValue);
+            const auto tmp = static_cast<unsigned char>(pixelValue);
+            pictureMap[row][col] = static_cast<float>(tmp);
         }
     }
 

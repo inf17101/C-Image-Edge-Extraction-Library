@@ -169,7 +169,7 @@ TEST(TestPicture, TestMakePaddingDefault)
 {
 	/*
 		Test Make Padding around image with default 1 pixel frame
-		pic.make_padding();
+		pic.makePadding();
 		picture should be extended with padding with default frame with of 1 pixel
 		Example:
 					0 0 0 0
@@ -187,7 +187,7 @@ TEST(TestPicture, TestMakePaddingDefault)
 	const std::vector<std::vector<float>> examplePictureMapPic(height, std::vector<float>(width, max_value));
 
 	PicturePGM pic{ height, width, size, max_value, examplePictureMapPic };
-	pic.make_padding();
+	pic.makePadding();
 	EXPECT_EQ(pic.getHeight(), height+padding*2);
 	EXPECT_EQ(pic.getWidth(), width+padding*2);
 	EXPECT_EQ(pic.getSize(), (height+padding*2) * (width+padding*2));
@@ -217,7 +217,7 @@ TEST(TestPicture, TestMakePaddingWith7PixelPadding)
 {
 	/*
 		Test Make Padding around image with 7 pixel frame
-		pic.make_padding(7);
+		pic.makePadding(7);
 		picture should be extended with padding with default frame with of 7 pixel
 		Example:
 					0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
@@ -247,7 +247,7 @@ TEST(TestPicture, TestMakePaddingWith7PixelPadding)
 	const std::vector<std::vector<float>> examplePictureMapPic(height, std::vector<float>(width, max_value));
 
 	PicturePGM pic{ height, width, size, max_value, examplePictureMapPic };
-	pic.make_padding(7);
+	pic.makePadding(7);
 
 	EXPECT_EQ(pic.getHeight(), height + padding * 2);
 	EXPECT_EQ(pic.getWidth(), width + padding * 2);
@@ -284,7 +284,7 @@ TEST(TestPicture, TestMakePaddingWithIllegalPaddingOption)
 {
 	/*
 		Test Make Padding around image with illegal padding argument
-		pic.make_padding(8);
+		pic.makePadding(8);
 		picture should not be extended and still remains the same
 		Example:
 		 8 8	8 8
@@ -300,7 +300,7 @@ TEST(TestPicture, TestMakePaddingWithIllegalPaddingOption)
 	const std::vector<std::vector<float>> examplePictureMapPic(height, std::vector<float>(width, max_value));
 
 	PicturePGM pic{ height, width, size, max_value, examplePictureMapPic };
-	pic.make_padding(illegalPadding);
+	pic.makePadding(illegalPadding);
 
 	// check if picture is unmodified because of illegal padding argument
 	EXPECT_EQ(pic.getHeight(), height);
