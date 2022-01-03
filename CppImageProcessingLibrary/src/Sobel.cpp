@@ -48,7 +48,6 @@ PicturePGM Sobel::processImage(PicturePGM& pic, Config& c) noexcept
     std::uint32_t newWidth = pic.getWidth() - 2;
     std::uint32_t new_size = pic.getHeight()-2 * pic.getWidth()-2;
 
-
     PicturePGM sobelPicture{
         newHeight, newWidth, new_size, max_value,
             std::vector<std::vector<float>>(newHeight, std::vector<float>(newWidth)) };
