@@ -1,10 +1,6 @@
 
 #include <iostream>
 #include <memory>
-#include <cstring>
-#include <algorithm>
-#include <fstream>
-#include <sstream>
 #include "Picture.h"
 #include "Sobel.h"
 #include "ImageAlgorithmStrategy.h"
