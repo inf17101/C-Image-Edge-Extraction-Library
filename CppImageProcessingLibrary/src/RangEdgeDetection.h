@@ -6,9 +6,12 @@
 class RangEdgeDetection : public ImageAlgorithmStrategy
 {
     public:
-        PicturePGM processImage(PicturePGM& pic, Config& c) noexcept override;
+        RangEdgeDetection(const std::uint8_t surrounding, const float thresholdValue);
+        PicturePGM processImage(PicturePGM& pic) noexcept override;
     private:
-        void calculate_rang_position(std::vector<float>& pixelVector) noexcept;
-        void replace_by_threshold(PicturePGM& pic, float threshold) noexcept;
-        bool isConfigValid(Config& c, float& threshold_value, unsigned int& surrounding) noexcept;
+        std::uint8_t surrounding_;
+        float thresholdValue_;
+
+        std::vector<float> calculate_rang_position(std::vector<std::pair<float, std::uint8_t>>& pixelVector) noexcept;
+        void replace_by_threshold(PicturePGM& pic) noexcept;
 };

@@ -19,9 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\ArrayFunctions.h" />
     <ClInclude Include="src\ImageAlgorithmStrategy.h" />
-    <ClInclude Include="src\ImageConfig.h" />
     <ClInclude Include="src\ImageProcessor.h" />
     <ClInclude Include="src\Picture.h" />
     <ClInclude Include="src\RangEdgeDetection.h" />

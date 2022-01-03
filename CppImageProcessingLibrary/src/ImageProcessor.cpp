@@ -1,6 +1,7 @@
 #include "ImageProcessor.h"
 #include <cstring>
 #include <fstream>
+#include <sstream>
 
 bool ImageProcessor::checkPaddingOption(std::uint8_t padding_size) const noexcept
 {
@@ -18,7 +19,15 @@ std::tuple<std::string, std::uint32_t, std::uint32_t, std::uint16_t> ImageProces
     std::uint32_t width{ 0 };
     std::uint32_t height{ 0 };
     std::uint16_t maxValue{ 0 };
-    inputFile >> header >> width >> height >> maxValue;
+    std::string line;
+    std::string buffer{ "" };
+    for (int i = 0; i < 3; ++i)
+    {
+        std::getline(inputFile, line);
+        buffer += (line + "\n");
+    }
+    std::istringstream iss{ buffer };
+    iss >> header >> width >> height >> maxValue;
     return { header, height, width, maxValue };
 }
 
@@ -51,9 +60,9 @@ PicturePGM ImageProcessor::readImage(const std::string& filename, std::uint8_t p
     return PicturePGM{ height, width, size, static_cast<std::uint8_t>(maxValue), pictureMap };
 }
 
-PicturePGM ImageProcessor::processImage(PicturePGM& pic, Config& c) noexcept
+PicturePGM ImageProcessor::processImage(PicturePGM& pic) noexcept
 {
-    return algorithm_->processImage(pic,c);
+    return algorithm_->processImage(pic);
 }
 
 bool ImageProcessor::writeImageAsPGM(PicturePGM& pic, const std::string& FILE_PATH) noexcept

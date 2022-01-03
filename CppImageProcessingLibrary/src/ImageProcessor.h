@@ -8,7 +8,7 @@ class ImageProcessor
     public:
         explicit ImageProcessor(std::unique_ptr<ImageAlgorithmStrategy> a) : algorithm_(std::move(a)) {}
         PicturePGM readImage(const std::string& filename, std::uint8_t padding_size = 2) noexcept;
-        PicturePGM processImage(PicturePGM& pic, Config& c) noexcept;
+        PicturePGM processImage(PicturePGM& pic) noexcept;
         bool writeImageAsPGM(PicturePGM& pic, const std::string& FILE_PATH) noexcept;
         ImageProcessor(const ImageProcessor& ) = delete;
         ImageProcessor(const ImageProcessor&&) = delete;

@@ -5,10 +5,13 @@
 class Sobel : public ImageAlgorithmStrategy
 {
     public:
-        PicturePGM processImage(PicturePGM& pic, Config& c) noexcept override;
+        Sobel(const float thresholdValue, const bool gradientOnly);
+        Sobel();
+        PicturePGM processImage(PicturePGM& pic) noexcept override;
 
     private:
-        bool isConfigValid(Config& c, float& threshold_value, bool& gradient_only);
+        float thresholdValue_;
+        bool gradientOnly_;
         constexpr static float sobel_Dx_[3][3] = { {-1, 0, 1}, {-2, 0, 2}, {-1, 0, 1} };
         constexpr static float sobel_Dy_[3][3] = { {-1, -2, -1}, {0, 0, 0}, {1, 2, 1} };
 
