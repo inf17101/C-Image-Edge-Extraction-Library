@@ -8,7 +8,7 @@
 class PicturePGM
 {
     public:
-        explicit PicturePGM(const std::uint32_t h, const std::uint32_t w, const std::uint32_t s, const std::uint16_t max_v, const std::vector<std::vector<float>>& m)
+        explicit PicturePGM(const std::uint32_t h, const std::uint32_t w, const std::uint64_t s, const std::uint16_t max_v, const std::vector<std::vector<float>>& m)
         : height_(h), width_(w), size_(s), maxValue_(max_v), map_(m) 
         {
         }
@@ -61,9 +61,9 @@ class PicturePGM
             std::cout << "Picture: " << "\n" << "width: " << width_ << "\nheight: " << height_ << std::endl;
             std::cout << "size: " << size_ << "\nmax value: " << static_cast<unsigned int>(maxValue_) << std::endl;
 
-            for(uint32_t i=0; i<height_; ++i)
+            for(std::uint32_t i=0; i<height_; ++i)
             {
-                for(uint32_t j=0; j<width_;++j)
+                for(std::uint32_t j=0; j<width_;++j)
                 {
                     printf("%.2f ", map_[i][j]);
                 }
@@ -84,8 +84,8 @@ class PicturePGM
             size_ = height_ * width_;
             std::vector<std::vector<float>> newMap(height_, std::vector<float>(width_, 0));
 
-            for(uint32_t i=padding; i<height_-padding; ++i)
-                for(uint32_t j=padding; j<width_-padding; ++j)
+            for(std::uint32_t i=padding; i<height_-padding; ++i)
+                for(std::uint32_t j=padding; j<width_-padding; ++j)
                     newMap[i][j] = map_[i-padding][j-padding];
  
             map_ = std::move(newMap);
@@ -107,14 +107,14 @@ class PicturePGM
 
             std::vector<std::vector<float>> newMap(height_, std::vector<float>(width_));
 
-            for(uint32_t row=padding; row<height_+padding*2-padding; ++row)
-                for(uint32_t col=padding; col<width_+padding*2-padding; ++col)
+            for(std::uint32_t row=padding; row<height_+padding*2-padding; ++row)
+                for(std::uint32_t col=padding; col<width_+padding*2-padding; ++col)
                     newMap[row-padding][col-padding] = map_[row][col];
         
             map_ = std::move(newMap);
         }
 
-        bool reinitWithValue(float value, uint32_t width, uint32_t height) noexcept
+        bool reinitWithValue(float value, std::uint32_t width, std::uint32_t height) noexcept
         {
             std::vector<std::vector<float>> newMap(height, std::vector<float>(width, value));
             map_ = std::move(newMap); 
@@ -170,7 +170,7 @@ class PicturePGM
     private:
         std::uint32_t height_;
         std::uint32_t width_;
-        std::uint32_t size_;
+        std::uint64_t size_;
         std::uint16_t maxValue_;
         std::vector<std::vector<float>> map_;
 };

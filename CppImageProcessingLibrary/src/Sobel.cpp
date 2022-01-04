@@ -6,7 +6,7 @@ Sobel::Sobel(const float thresholdValue, const bool gradientOnly):thresholdValue
 {
 }
 
-Sobel::Sobel() : gradientOnly_(true), thresholdValue_(0.0f)
+Sobel::Sobel() : thresholdValue_(0.0f), gradientOnly_(true)
 {
 }
 
@@ -15,18 +15,18 @@ PicturePGM Sobel::processImage(PicturePGM& pic) noexcept
     if (pic.isEmpty())
         return PicturePGM{};
 
-    std::uint8_t max_value = gradientOnly_ ? pic.getMaxValue() : 255;
+    std::uint8_t maxValue = gradientOnly_ ? pic.getMaxValue() : 255;
     std::uint32_t newHeight = pic.getHeight() - 2;
     std::uint32_t newWidth = pic.getWidth() - 2;
-    std::uint32_t new_size = newHeight * newWidth;
+    std::uint32_t newSize = newHeight * newWidth;
 
     PicturePGM sobelPicture{
-        newHeight, newWidth, new_size, max_value,
+        newHeight, newWidth, newSize, maxValue,
             std::vector<std::vector<float>>(newHeight, std::vector<float>(newWidth)) };
 
-    for(uint32_t i=0; i<pic.getHeight()-2; i++)
+    for(std::uint32_t i{0}; i<pic.getHeight()-2; i++)
     {
-        for(uint32_t j=0; j<pic.getWidth()-2; j++)
+        for(std::uint32_t j{0}; j<pic.getWidth()-2; j++)
         {
             float Sx_i = 0, Sy_i = 0;
             for(int n=0; n<3; ++n)

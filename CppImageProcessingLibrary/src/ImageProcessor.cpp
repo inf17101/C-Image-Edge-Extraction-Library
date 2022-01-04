@@ -45,7 +45,7 @@ PicturePGM ImageProcessor::readImage(const std::string& filename, std::uint8_t p
     const auto [pgmVersion, height, width, maxValue] = readHeader(inputFile);
     if (!isValidPGMHeader(pgmVersion, height, width, maxValue)) { return PicturePGM{}; }
 
-    const std::uint32_t size = height * width;
+    const std::uint64_t size = height * width;
     std::vector<std::vector<float>> pictureMap(height, std::vector<float>(width, 0.0f));
     char pixelValue;
     for (std::uint32_t row{ 0 }; row < height; ++row)
@@ -94,5 +94,4 @@ bool ImageProcessor::writeImageAsPGM(PicturePGM& pic, const std::string& FILE_PA
     of.close();
 
     return true;
-
 }

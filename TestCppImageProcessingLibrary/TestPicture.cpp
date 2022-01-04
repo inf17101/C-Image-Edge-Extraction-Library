@@ -20,7 +20,7 @@ TEST(TestPicture, TestConstructor) {
 	*/
 
 	const uint32_t height = 9, width = 9;
-	const uint32_t size = height * width;
+	const uint64_t size = height * width;
 	const uint8_t max_value = 128;
 	const std::vector<std::vector<float>> examplePictureMap{ height, std::vector<float>{width} };
 	
@@ -38,7 +38,7 @@ TEST(TestPicture, TestCopyConstructor)
 	*/
 
 	const uint32_t height = 9, width = 9;
-	const uint32_t size = height * width;
+	const uint64_t size = height * width;
 	const uint8_t max_value = 128;
 
 	const std::vector<std::vector<float>> examplePictureMap( height, std::vector<float>(width));
@@ -61,7 +61,7 @@ TEST(TestPicture, TestMoveConstructor)
 	*/
 
 	const uint32_t height = 9, width = 9;
-	const uint32_t size = height * width;
+	const uint64_t size = height * width;
 	const uint8_t max_value = 0;
 	const std::vector<std::vector<float>>examplePictureMap(height, std::vector<float>(width));
 
@@ -85,7 +85,7 @@ TEST(TestPicture, TestCopyAssignmentWithDifferentSize)
 		pic1 has different height, width and size than pic2
 	*/
 	const uint32_t height = 9, width = 9;
-	const uint32_t size = height * width;
+	const uint64_t size = height * width;
 	const uint8_t max_value = 0;
 	const std::vector<std::vector<float>> examplePictureMap( height, std::vector<float>(width));
 
@@ -109,10 +109,10 @@ TEST(TestPicture, TestCopyAssignmentWithSameSize)
 	/*
 		Test Copy Assignment,
 		like pic1 = pic2;
-		üic1 and pic2 have the same size
+		ï¿½ic1 and pic2 have the same size
 	*/
 	const uint32_t height = 9, width = 9;
-	const uint32_t size = height * width;
+	const uint64_t size = height * width;
 	const uint8_t max_valuePic1 = 0;
 	const uint8_t max_valuePic2 = 8;
 
@@ -141,7 +141,7 @@ TEST(TestPicture, TestMoveAssignment)
 		pic2 should be set to valid state
 	*/
 	const uint32_t height = 9, width = 9;
-	const uint32_t size = height * width;
+	const uint64_t size = height * width;
 	const uint8_t max_value = 8;
 	const std::vector<std::vector<float>>examplePictureMapPic2(height, std::vector<float>(width, max_value));
 
@@ -181,7 +181,7 @@ TEST(TestPicture, TestMakePaddingDefault)
 	*/
 
 	const uint32_t height = 2, width = 2;
-	const uint32_t size = height * width;
+	const uint64_t size = height * width;
 	const uint8_t max_value = 8;
 	const uint8_t padding = 1;
 	const std::vector<std::vector<float>> examplePictureMapPic(height, std::vector<float>(width, max_value));
@@ -241,7 +241,7 @@ TEST(TestPicture, TestMakePaddingWith7PixelPadding)
 	*/
 
 	const uint32_t height = 2, width = 2;
-	const uint32_t size = height * width;
+	const uint64_t size = height * width;
 	const uint8_t max_value = 8;
 	const uint8_t padding = 7;
 	const std::vector<std::vector<float>> examplePictureMapPic(height, std::vector<float>(width, max_value));
@@ -294,7 +294,7 @@ TEST(TestPicture, TestMakePaddingWithIllegalPaddingOption)
 	*/
 
 	const uint32_t height = 2, width = 2;
-	const uint32_t size = height * width;
+	const uint64_t size = height * width;
 	const uint8_t max_value = 8;
 	const uint8_t illegalPadding = 8;
 	const std::vector<std::vector<float>> examplePictureMapPic(height, std::vector<float>(width, max_value));
@@ -325,9 +325,9 @@ TEST(TestPicture, TestRemovePadding)
 		size = height * width
 	*/
 	const uint32_t oldHeight = 2, oldWidth = 2;
-	const uint32_t oldSize = oldHeight * oldWidth;
+	const uint64_t oldSize = oldHeight * oldWidth;
 	const uint32_t height = 4, width = 4;
-	const uint32_t size = height * width;
+	const uint64_t size = height * width;
 	const uint8_t max_value = 8;
 
 	std::vector<std::vector<float>> examplePictureMapPic(height, std::vector<float>(width, 0.0f));
@@ -378,9 +378,9 @@ TEST(TestPicture, TestRemovePaddingNoDefaultPadding)
 		size = height * width
 	*/
 	const uint32_t oldHeight = 2, oldWidth = 2;
-	const uint32_t oldSize = oldHeight * oldWidth;
+	const uint64_t oldSize = oldHeight * oldWidth;
 	const uint32_t height = 16, width = 16;
-	const uint32_t size = height * width;
+	const uint64_t size = height * width;
 	const uint8_t max_value = 8;
 	const uint8_t paddingSize = 7;
 
@@ -418,9 +418,8 @@ TEST(TestPicture, TestRemovePaddingIllegalPaddingSize)
 		size = height * width
 	*/
 	const uint32_t oldHeight = 2, oldWidth = 2;
-	const uint32_t oldSize = oldHeight * oldWidth;
 	const uint32_t height = 4, width = 4;
-	const uint32_t size = height * width;
+	const uint64_t size = height * width;
 	const uint8_t max_value = 8;
 	const uint8_t paddingSize = 10;
 
