@@ -19,4 +19,12 @@ It does not show all complete classes along with all attributes and methods of t
 
 ## How to use
 
+```
+git clone https://github.com/inf17101/C-Image-Edge-Extraction-Library.git
+cd C-Image-Edge-Extraction-Library/CppImageProcessingLibrary/src/
+mkdir ../out
+g++ -g -Wall -std=c++17 *.cpp -o edgeExtraction.out
+./edgeExtraction.out
+```
+
 Note: create a folder called `out` inside the directory `C-Image-Edge-Extraction-Library/CppImageProcessingLibrary/`. Otherwise no output is generated.
