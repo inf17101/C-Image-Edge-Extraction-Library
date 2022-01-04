@@ -12,6 +12,6 @@ class RangEdgeDetection : public ImageAlgorithmStrategy
         std::uint8_t surrounding_;
         float thresholdValue_;
 
-        std::vector<float> calculate_rang_position(std::vector<std::pair<float, std::uint8_t>>& pixelVector) noexcept;
+        auto calculate_rang_position(std::vector<float>& pixelVector);
         void replace_by_threshold(PicturePGM& pic) noexcept;
 };

@@ -7,55 +7,25 @@ RangEdgeDetection::RangEdgeDetection(const std::uint8_t surrounding, const float
 {
 }
 
-std::vector<float> RangEdgeDetection::calculate_rang_position(std::vector<std::pair<float, std::uint8_t>>& pixelVector) noexcept
+auto RangEdgeDetection::calculate_rang_position(std::vector<float>& pixelVector)
 {
-    std::sort(pixelVector.begin(), pixelVector.end(), [](const auto& lhs, const auto& rhs) { return lhs.first < rhs.first; });
-    size_t pos{ 0 };
-    const size_t sizeOfVector{ pixelVector.size() };
-    int first{ -1 };
-    int last{ -1 };
-    auto item = pixelVector[0].first;
-    for(; pos < sizeOfVector; ++pos)
+    std::vector<float> copyPixelVector(pixelVector);
+    std::sort(copyPixelVector.begin(), copyPixelVector.end());
+    for (auto& element : pixelVector)
     {
-        if(pixelVector[pos].first != item)
-        {
-            item = pixelVector[pos].first;
-            if(first < last)
-            {
-                int rang = (first+last)/2;
-                for(;first<=last; ++first)
-                    pixelVector[first-1].first = static_cast<float>(rang);
-            }else
-            {
-                pixelVector[pos-1].first = static_cast<float>(first);
-            }
+        auto itFirst = std::find(copyPixelVector.begin(), copyPixelVector.end(), element);
+        auto itLast = std::find(copyPixelVector.rbegin(), copyPixelVector.rend(), element);
+        if (itFirst == copyPixelVector.end() || itLast == copyPixelVector.rend())
+            throw std::logic_error("vector with range positions might be corrupt.");
 
-            first = -1;
-            last = -1;
-        }
-
-        if(first == -1)
-                first = pos+1;
-
-        last = pos+1;
+        std::uint64_t posFirst = std::distance(copyPixelVector.begin(), itFirst) + 1;
+        std::uint64_t posLast = std::distance(itLast, copyPixelVector.rend());
+        std::uint64_t rang = posFirst == posLast ? posFirst : ((posFirst + posLast) / 2);
+        element = static_cast<float>(rang);
     }
-
-        if(first < last)
-        {
-        int rang = (first+last)/2;
-        for(;first<=last; ++first)
-            pixelVector[first-1].first = static_cast<float>(rang);
-        }else
-        {
-            pixelVector[pos-1].first= static_cast<float>(first);
-        }
-    std::vector<float> tmp(sizeOfVector);
-    for (const auto& rang : pixelVector)
-    {
-        tmp[rang.second] = rang.first;
-    }
-    return tmp;
+    return pixelVector;
 }
+
 
 void RangEdgeDetection::replace_by_threshold(PicturePGM& pic) noexcept
 {
@@ -81,8 +51,8 @@ PicturePGM RangEdgeDetection::processImage(PicturePGM& pic) noexcept
                     pic.getHeight() * pic.getWidth(), pic.getMaxValue(),
                     std::vector<std::vector<float>>(pic.getHeight(), std::vector<float>(pic.getWidth())) };
 
-    const unsigned int surrounding_size = surrounding_ * surrounding_;
-    std::vector<std::pair<float, std::uint8_t>> pixel_surrounding(surrounding_size);
+    const std::uint32_t surrounding_size = surrounding_ * surrounding_;
+    std::vector<float> pixel_surrounding(surrounding_size);
     const std::uint32_t amountOfRows = GradientPicture.getHeight() - (surrounding_ - 1);
     const std::uint32_t amountOfCols = GradientPicture.getWidth() - (surrounding_ - 1);
     for (uint32_t row{0}; row < amountOfRows; ++row)
@@ -91,7 +61,7 @@ PicturePGM RangEdgeDetection::processImage(PicturePGM& pic) noexcept
         {
             for(unsigned int i = 0; i<surrounding_; ++i)
                 for(unsigned int j = 0; j<surrounding_; ++j)
-                    pixel_surrounding[(i * surrounding_) + j] = { GradientPicture.get(row + i, col + j), (i * surrounding_) + j };
+                    pixel_surrounding[(i * surrounding_) + j] = GradientPicture.get(row + i, col + j);
 
             auto rangePositions = calculate_rang_position(pixel_surrounding);
 
